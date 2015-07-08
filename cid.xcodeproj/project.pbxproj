@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		09D06F9C1B499B5D0038CD8A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 09D06F9B1B499B5D0038CD8A /* main.m */; };
+		09D06FA31B499B700038CD8A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09D06FA21B499B700038CD8A /* QuartzCore.framework */; };
+		09D06FA61B499C1B0038CD8A /* CidSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 09D06FA51B499C1B0038CD8A /* CidSerializer.m */; };
+		09D06FAF1B4A12CD0038CD8A /* CidApp.m in Sources */ = {isa = PBXBuildFile; fileRef = 09D06FAE1B4A12CD0038CD8A /* CidApp.m */; };
+		09D06FB91B4B5EEF0038CD8A /* CIFeature+Dict.m in Sources */ = {isa = PBXBuildFile; fileRef = 09D06FB81B4B5EEF0038CD8A /* CIFeature+Dict.m */; };
+		09D06FBC1B4C089D0038CD8A /* CidException.m in Sources */ = {isa = PBXBuildFile; fileRef = 09D06FBB1B4C089D0038CD8A /* CidException.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +30,15 @@
 /* Begin PBXFileReference section */
 		09D06F981B499B5D0038CD8A /* cid */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cid; sourceTree = BUILT_PRODUCTS_DIR; };
 		09D06F9B1B499B5D0038CD8A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		09D06FA21B499B700038CD8A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		09D06FA41B499C1B0038CD8A /* CidSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CidSerializer.h; sourceTree = "<group>"; };
+		09D06FA51B499C1B0038CD8A /* CidSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CidSerializer.m; sourceTree = "<group>"; };
+		09D06FAD1B4A12CD0038CD8A /* CidApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CidApp.h; sourceTree = "<group>"; };
+		09D06FAE1B4A12CD0038CD8A /* CidApp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CidApp.m; sourceTree = "<group>"; };
+		09D06FB71B4B5EEF0038CD8A /* CIFeature+Dict.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CIFeature+Dict.h"; sourceTree = "<group>"; };
+		09D06FB81B4B5EEF0038CD8A /* CIFeature+Dict.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CIFeature+Dict.m"; sourceTree = "<group>"; };
+		09D06FBA1B4C089D0038CD8A /* CidException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CidException.h; sourceTree = "<group>"; };
+		09D06FBB1B4C089D0038CD8A /* CidException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CidException.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				09D06FA31B499B700038CD8A /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,6 +56,7 @@
 		09D06F8F1B499B5D0038CD8A = {
 			isa = PBXGroup;
 			children = (
+				09D06FA21B499B700038CD8A /* QuartzCore.framework */,
 				09D06F9A1B499B5D0038CD8A /* cid */,
 				09D06F991B499B5D0038CD8A /* Products */,
 			);
@@ -57,6 +73,14 @@
 		09D06F9A1B499B5D0038CD8A /* cid */ = {
 			isa = PBXGroup;
 			children = (
+				09D06FAD1B4A12CD0038CD8A /* CidApp.h */,
+				09D06FAE1B4A12CD0038CD8A /* CidApp.m */,
+				09D06FBA1B4C089D0038CD8A /* CidException.h */,
+				09D06FBB1B4C089D0038CD8A /* CidException.m */,
+				09D06FB71B4B5EEF0038CD8A /* CIFeature+Dict.h */,
+				09D06FB81B4B5EEF0038CD8A /* CIFeature+Dict.m */,
+				09D06FA41B499C1B0038CD8A /* CidSerializer.h */,
+				09D06FA51B499C1B0038CD8A /* CidSerializer.m */,
 				09D06F9B1B499B5D0038CD8A /* main.m */,
 			);
 			path = cid;
@@ -118,6 +142,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				09D06FBC1B4C089D0038CD8A /* CidException.m in Sources */,
+				09D06FAF1B4A12CD0038CD8A /* CidApp.m in Sources */,
+				09D06FA61B499C1B0038CD8A /* CidSerializer.m in Sources */,
+				09D06FB91B4B5EEF0038CD8A /* CIFeature+Dict.m in Sources */,
 				09D06F9C1B499B5D0038CD8A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
