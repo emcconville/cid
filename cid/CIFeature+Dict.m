@@ -31,26 +31,27 @@ NSDictionary * (^pointToObject)(CGPoint) = ^(CGPoint point)
 {
     
     CIFaceFeature * this = (CIFaceFeature *)self;
+    NSMutableDictionary * subFeature;
     if ([this hasLeftEyePosition]) {
-        NSMutableDictionary * leftEye = [NSMutableDictionary dictionaryWithDictionary:pointToObject([this leftEyePosition])];
+        subFeature = [NSMutableDictionary dictionaryWithDictionary:pointToObject([this leftEyePosition])];
         if (closed) {
-            [leftEye setObject:@([this leftEyeClosed]) forKey:@"closed"];
+            [subFeature setObject:@([this leftEyeClosed]) forKey:@"closed"];
         }
-        [outDict setObject:[leftEye copy] forKey:@"leftEye"];
+        [outDict setObject:[subFeature copy] forKey:@"leftEye"];
     }
     if ([this hasRightEyePosition]) {
-        NSMutableDictionary * rightEye = [NSMutableDictionary dictionaryWithDictionary:pointToObject([this rightEyePosition])];
+        subFeature = [NSMutableDictionary dictionaryWithDictionary:pointToObject([this rightEyePosition])];
         if (closed) {
-            [rightEye setObject:@([this rightEyeClosed]) forKey:@"closed"];
+            [subFeature setObject:@([this rightEyeClosed]) forKey:@"closed"];
         }
-        [outDict setObject:[rightEye copy] forKey:@"rightEye"];
+        [outDict setObject:[subFeature copy] forKey:@"rightEye"];
     }
     if ([this hasMouthPosition]) {
-        NSMutableDictionary * mouth = [NSMutableDictionary dictionaryWithDictionary:pointToObject([this mouthPosition])];
+        subFeature = [NSMutableDictionary dictionaryWithDictionary:pointToObject([this mouthPosition])];
         if (smile) {
-            [mouth setObject:@([this hasSmile]) forKey:@"smile"];
+            [subFeature setObject:@([this hasSmile]) forKey:@"smile"];
         }
-        [outDict setObject:[mouth copy] forKey:@"mouth"];
+        [outDict setObject:[subFeature copy] forKey:@"mouth"];
     }
     return outDict;
 }

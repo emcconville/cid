@@ -46,10 +46,13 @@
         }
         case kSVG : {
             NSDictionary * feat, * subFeat;
+            NSString * tmp, * key;
             NSString * header = @"<?xml version=\"1.0\"?>\n"
-            @"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"%0.0f\" height=\"%0.0f\" viewbox=\"%0.0f %0.0f %0.0f %0.0f\">\n"
-            @"<style>rect, circle {stroke-width: 2px; fill: transparent; }"
-            @"circle { stroke: blue; } rect { stroke: red; } svg { background: transparent url('%@') no-repeat; }</style>\n";
+            @"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" "
+            @"width=\"%0.0f\" height=\"%0.0f\" viewbox=\"%0.0f %0.0f %0.0f %0.0f\">\n"
+            @"<style>\nrect, circle {stroke-width: 2px; fill: transparent; }"
+            @"\ncircle { stroke: blue; }\nrect { stroke: red; }\nsvg { background: "
+            @"transparent url('%@') no-repeat; }\n</style>\n";
             NSString * retangle = @"\t<rect x=\"%ld\" y=\"%ld\" width=\"%ld\" height=\"%ld\" />\n";
             NSString * point = @"\t<circle cx=\"%ld\" cy=\"%ld\" r=\"2\" />\n";
             NSString * group = @"<g>\n%@</g>\n";
@@ -62,7 +65,6 @@
                               E.size.width,
                               E.size.height,
                               [[app inputImage] absoluteString]];
-            NSString * tmp;
             for (feat in list) {
                 tmp = [NSString stringWithFormat:retangle,
                        [[feat objectForKey:@"x"] longValue],
@@ -70,9 +72,8 @@
                        [[feat objectForKey:@"width"] longValue],
                        [[feat objectForKey:@"height"] longValue]
                        ];
-                for (NSString * key in @[@"leftEye", @"rightEye", @"mouth",
-                                         @"topLeft", @"topRight", @"bottomLeft",
-                                         @"bottomRight",]) {
+                for (key in @[@"leftEye", @"rightEye", @"mouth", @"topLeft",
+                              @"topRight", @"bottomLeft", @"bottomRight",]) {
                     if ((subFeat = [feat objectForKey:key]) != nil) {
                         tmp = [tmp stringByAppendingString:[NSString stringWithFormat:point,
                                                             [[subFeat objectForKey:@"x"] longValue],

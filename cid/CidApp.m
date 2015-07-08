@@ -64,6 +64,8 @@ static const char * _help = "\n"
 "-blink       Include closed-eye feature in `face' command.\n"
 "-low         Set low accuracy for faster detection.\n"
 "-smile       Include smile detection in `face' command.\n"
+"-yAxis       Invert Y-axis coordinate system making the\n"
+"             origin of an image top-left.\n"
 "\n"
 "Argument Keywords\n"
 "-----------------\n"
@@ -77,6 +79,7 @@ static const char * _help = "\n"
 "                  - JSON       (default)\n"
 "                  - PLIST      (xml style)\n"
 "                  - PLIST_BIN  (binary style)\n"
+"                  - SVG\n"
 "-orientation <I>  Define image orientation. If omitted, orientation\n"
 "                  will be extracted by image meta-data.\n"
 "                  Expecting integer value between 1 & 8\n"
@@ -216,6 +219,7 @@ void help() {
 }
 -(BOOL)scan
 {
+    CIFeature * feature;
     CIImage * source;
     NSNumber * height;
     NSArray * roi;
@@ -223,10 +227,24 @@ void help() {
     if (inputImagePath == nil) {
         [CidException throwMessage:@"Missing input image.\n"];
     }
-    _inputImage = [NSURL fileURLWithPath:inputImagePath];
-    source = [CIImage imageWithContentsOfURL:_inputImage];
+    if ([inputImagePath isEqualToString:@"-"]) {
+        NSFileHandle * stdIn = [NSFileHandle fileHandleWithStandardInput];
+        NSData * blob = [NSData dataWithData:[stdIn readDataToEndOfFile]];
+        [stdIn closeFile];
+        /*
+         // In the rare event that we would ever want a base64 data url
+        NSData * base64 = [blob base64EncodedDataWithOptions:0];
+        inputImagePath = [[NSString alloc] initWithData:base64
+                                               encoding:NSUTF8StringEncoding];
+        */
+        _inputImage = [NSURL fileURLWithPath:@"-"];
+        source = [CIImage imageWithData:blob];
+    } else {
+        _inputImage = [NSURL fileURLWithPath:inputImagePath];
+        source = [CIImage imageWithContentsOfURL:_inputImage];
+    }
     if (source == nil) {
-        [CidException throwMessage:@"Unable to read image @ `%@'.\n", _inputImage];
+        [CidException throwMessage:@"Unable to read image @ `%@'.\n", [_inputImage absoluteString]];
     }
     extent = [source extent];
     height = [NSNumber numberWithDouble:extent.size.height];
@@ -240,7 +258,7 @@ void help() {
     }
     roi = [scanner featuresInImage:source options:detectorFeatures];
     features = [NSMutableArray array];
-    for ( CIFeature * feature in roi) {
+    for (feature in roi) {
         [features addObject:[feature dict:detectorFeatures]];
     }
     return YES;
