@@ -13,6 +13,7 @@
 		09D06FAF1B4A12CD0038CD8A /* CidApp.m in Sources */ = {isa = PBXBuildFile; fileRef = 09D06FAE1B4A12CD0038CD8A /* CidApp.m */; };
 		09D06FB91B4B5EEF0038CD8A /* CIFeature+Dict.m in Sources */ = {isa = PBXBuildFile; fileRef = 09D06FB81B4B5EEF0038CD8A /* CIFeature+Dict.m */; };
 		09D06FBC1B4C089D0038CD8A /* CidException.m in Sources */ = {isa = PBXBuildFile; fileRef = 09D06FBB1B4C089D0038CD8A /* CidException.m */; };
+		09E3BEE81B4DCD4200536500 /* CidTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 09E3BEE71B4DCD4200536500 /* CidTypes.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -39,6 +40,8 @@
 		09D06FB81B4B5EEF0038CD8A /* CIFeature+Dict.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CIFeature+Dict.m"; sourceTree = "<group>"; };
 		09D06FBA1B4C089D0038CD8A /* CidException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CidException.h; sourceTree = "<group>"; };
 		09D06FBB1B4C089D0038CD8A /* CidException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CidException.m; sourceTree = "<group>"; };
+		09E3BEE61B4DCB8200536500 /* CidTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CidTypes.h; sourceTree = "<group>"; };
+		09E3BEE71B4DCD4200536500 /* CidTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CidTypes.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +85,8 @@
 				09D06FA41B499C1B0038CD8A /* CidSerializer.h */,
 				09D06FA51B499C1B0038CD8A /* CidSerializer.m */,
 				09D06F9B1B499B5D0038CD8A /* main.m */,
+				09E3BEE61B4DCB8200536500 /* CidTypes.h */,
+				09E3BEE71B4DCD4200536500 /* CidTypes.m */,
 			);
 			path = cid;
 			sourceTree = "<group>";
@@ -146,6 +151,7 @@
 				09D06FAF1B4A12CD0038CD8A /* CidApp.m in Sources */,
 				09D06FA61B499C1B0038CD8A /* CidSerializer.m in Sources */,
 				09D06FB91B4B5EEF0038CD8A /* CIFeature+Dict.m in Sources */,
+				09E3BEE81B4DCD4200536500 /* CidTypes.m in Sources */,
 				09D06F9C1B499B5D0038CD8A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -263,6 +269,7 @@
 				09D06FA11B499B5D0038CD8A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -8,7 +8,7 @@
 
 #import "CidApp.h"
 #import "CidException.h"
-
+#import "CidTypes.h"
 
 #pragma mark - Application Info
 
@@ -41,6 +41,11 @@ void version() {
 static const char * _usage = ""
 "Usage: cid <command> [arguments, ...] <file>\n"
 "       cid help\n"
+"       cid face [-blink] [-smile] input.jpg\n"
+"       cid rectangle [-aspectRatio <double>] [-focalLength <double>] input.jpg\n"
+"       cid qr input.jpg\n"
+"       cid (face|rectangle|qr) [-low] [-yAxis] [-format (JSON|PLIST|SVG)] \\ \n"
+"           [orientation <integer>] [-o <path>] [-threshold <double>] input.jpg\n"
 "\n";
 
 void usage() {
@@ -52,41 +57,41 @@ static const char * _help = "\n"
 "Commands\n"
 "--------\n"
 "\n"
-"face         Detect faces in an image.\n"
-"help, -h     Display this help message.\n"
-"rectangle    Detect rectangles in an image.\n"
-"qr           Detect & decode QR codes in an image.\n"
-"version, -v  Display version info.\n"
+"face                    Detect faces in an image.\n"
+"help, -h                Display this help message.\n"
+"rectangle               Detect rectangles in an image.\n"
+"qr                      Detect & decode QR codes in an image.\n"
+"version, -v             Display version info.\n"
 "\n"
 "Argument Flags\n"
 "--------------\n"
 "\n"
-"-blink       Include closed-eye feature in `face' command.\n"
-"-low         Set low accuracy for faster detection.\n"
-"-smile       Include smile detection in `face' command.\n"
-"-yAxis       Invert Y-axis coordinate system making the\n"
-"             origin of an image top-left.\n"
+"-blink                  Include closed-eye feature in `face' command.\n"
+"-low                    Set low accuracy for faster detection.\n"
+"-smile                  Include smile detection in `face' command.\n"
+"-yAxis                  Invert Y-axis coordinate system making the\n"
+"                        origin of an image top-left.\n"
 "\n"
 "Argument Keywords\n"
 "-----------------\n"
 "\n"
-"-aspectRatio <F>  Set rectangle detector aspect ration.\n"
-"                  Where <F> is width / height.\n"
-"-focalLength <F>  Set rectangle detector focal length.\n"
-"                  Expecting value between -1.0 and 1.0.\n"
-"-format <type>    Set output sterilization format.\n"
-"                  Type can be one of the following:\n"
-"                  - JSON       (default)\n"
-"                  - PLIST      (xml style)\n"
-"                  - PLIST_BIN  (binary style)\n"
-"                  - SVG\n"
-"-orientation <I>  Define image orientation. If omitted, orientation\n"
-"                  will be extracted by image meta-data.\n"
-"                  Expecting integer value between 1 & 8\n"
-"-o <path>         Write features to file path. If omitted, features\n"
-"                  will be written to stdout.\n"
-"-threshold <F>    Set minimum dimension size of feature detection.\n"
-"                  Expecting value between 0.0 and 1.0.\n"
+"-aspectRatio <double>   Set rectangle detector aspect ration.\n"
+"                        Where <F> is width / height.\n"
+"-focalLength <double>   Set rectangle detector focal length.\n"
+"                        Expecting value between -1.0 and 1.0.\n"
+"-format <type>          Set output sterilization format.\n"
+"                        Type can be one of the following:\n"
+"                        - JSON       (default)\n"
+"                        - PLIST      (xml style)\n"
+"                        - PLIST_BIN  (binary style)\n"
+"                        - SVG\n"
+"-orientation <integer>  Define image orientation. If omitted, orientation\n"
+"                        will be extracted by image meta-data.\n"
+"                        Expecting integer value between 1 & 8\n"
+"-o <path>               Write features to file path. If omitted, features\n"
+"                        will be written to stdout.\n"
+"-threshold <double>     Set minimum dimension size of feature detection.\n"
+"                        Expecting value between 0.0 and 1.0.\n"
 "\n"
 ;
 
@@ -106,12 +111,10 @@ void help() {
     if (self) {
         accuracy = [NSMutableDictionary dictionaryWithDictionary:@{CIDetectorAccuracy: CIDetectorAccuracyHigh}];
         detectorFeatures = [NSMutableDictionary dictionary];
-//        [detectorFeatures setObject:@YES forKey:CIDetectorSmile];
-//        [detectorFeatures setObject:@NO forKey:CIDetectorEyeBlink];
         
-        _flags = @[@"-blink", @"-yAxis", @"-low", @"-smile"];
-        _kwargs = @[@"-aspectRatio", @"-focalLength", @"-format",
-                    @"-o", @"-orientation", @"-threshold"];
+        _flags = @[fLow, fBlink, fSmile, fYAxis];
+        _kwargs = @[wAspectRatio, wFocalLength, wFormat,
+                    wOut, wOrientation, wThreshold];
         
         // Allocate context for detector to operate in
         buffer = [[CIContext alloc] init];
@@ -137,33 +140,36 @@ void help() {
                 [CidException throwMessage:@"%@ missing value.\n", argument];
             }
             value = [NSString stringWithUTF8String:argv[i]];
-            if ([argument isEqualToString:@"-threshold"]) {
+            if ([argument isEqualToString:wThreshold]) {
                 dNumber = [value doubleValue];
-                if (dNumber < 0.0 || dNumber > 1.0) {
-                    [CidException throwMessage:@"-threshold must be between 0.0 & 1.0, not %f.\n", dNumber];
-                }
+                [self validate:wThreshold
+                         value:dNumber
+                       between:0.0
+                           and:1.0];
                 [accuracy setObject:[NSNumber numberWithDouble:dNumber]
                                      forKey:CIDetectorMinFeatureSize];
-            } else if ([argument isEqualToString:@"-aspectRatio"]) {
+            } else if ([argument isEqualToString:wAspectRatio]) {
                 [detectorFeatures setObject:@([value floatValue])
                                      forKey:CIDetectorAspectRatio];
-            } else if ([argument isEqualToString:@"-focalLength"]) {
+            } else if ([argument isEqualToString:wFocalLength]) {
                 dNumber = [value doubleValue];
-                if (dNumber < -1.0 || dNumber > 1.0) {
-                    [CidException throwMessage:@"-focalLength must be between -1.0 & 1.0, not %f.\n", dNumber];
-                }
+                [self validate:wFocalLength
+                         value:dNumber
+                       between:-1.0
+                           and:1.0];
                 [detectorFeatures setObject:[NSNumber numberWithDouble:dNumber]
                                      forKey:CIDetectorFocalLength];
-            } else if ([argument isEqualToString:@"-orientation"]) {
+            } else if ([argument isEqualToString:wOrientation]) {
                 lNumber = [value integerValue];
-                if (lNumber < 1 || lNumber > 8 ) {
-                    [CidException throwMessage:@"-orientation must be between 1 & 8, not %ld.\n", lNumber];
-                }
+                [self validate:argument
+                         value:(double)lNumber
+                       between:1.0
+                           and:8.0];
                 [detectorFeatures setObject:[NSNumber numberWithInteger:lNumber]
                                      forKey:CIDetectorImageOrientation];
-            } else if ([argument isEqualToString:@"-o"]) {
+            } else if ([argument isEqualToString:wOut]) {
                 outputPath = value;
-            } else if ([argument isEqualToString:@"-format"]) {
+            } else if ([argument isEqualToString:wFormat]) {
                 value = [value lowercaseString];
                 if ([value isEqualToString:@"json"]) {
                     outputFormatType = kJSON;
@@ -172,21 +178,21 @@ void help() {
                 } else if ([value isEqualToString:@"plist_bin"]) {
                     outputFormatType = kPListBin;
                 } else if ([value isEqualToString:@"svg"]) {
-                    [detectorFeatures setObject:@YES forKey:@"yAxis"];
+                    [detectorFeatures setObject:@YES forKey:kYAxis];
                     outputFormatType = kSVG;
                 } else {
                     [CidException throwMessage:@"Unknown format `%@'.\n", value];
                 }
             }
         } else if ([_flags indexOfObject:argument] != NSNotFound) {
-            if ([argument isEqualToString:@"-low"]) {
+            if ([argument isEqualToString:fLow]) {
                 [accuracy setObject:CIDetectorAccuracyLow forKey:CIDetectorAccuracy];
-            } else if ([argument isEqualToString:@"-blink"]) {
+            } else if ([argument isEqualToString:fBlink]) {
                 [detectorFeatures setObject:@YES forKey:CIDetectorEyeBlink];
-            } else if ([argument isEqualToString:@"-smile"]) {
+            } else if ([argument isEqualToString:fSmile]) {
                 [detectorFeatures setObject:@YES forKey:CIDetectorSmile];
-            } else if ([argument isEqualToString:@"-yAxis"]) {
-                [detectorFeatures setObject:@YES forKey:@"yAxis"];
+            } else if ([argument isEqualToString:fYAxis]) {
+                [detectorFeatures setObject:@YES forKey:kYAxis];
             }
         } else {
             if (inputImagePath == nil) {
@@ -200,16 +206,16 @@ void help() {
 }
 -(BOOL)createScanner
 {
-    if ([command isEqualToString:@"face"]) {
+    if ([command isEqualToString:kFace]) {
         scanner = [CIDetector detectorOfType:CIDetectorTypeFace context:buffer options:accuracy];
-    } else if ([command isEqualToString:@"rectangle"]) {
+    } else if ([command isEqualToString:kRectangle]) {
         scanner = [CIDetector detectorOfType:CIDetectorTypeRectangle context:buffer options:accuracy];
-    }  else if ([command isEqualToString:@"qr"]) {
+    }  else if ([command isEqualToString:kQR]) {
         scanner = [CIDetector detectorOfType:CIDetectorTypeQRCode context:buffer options:accuracy];
-    } else if ([command isEqualToString:@"help"] || [command isEqualToString:@"-h"]) {
+    } else if ([command isEqualToString:kHelp] || [command isEqualToString:@"-h"]) {
         help();
         return NO;
-    } else if ([command isEqualToString:@"version"] || [command isEqualToString:@"-v"]) {
+    } else if ([command isEqualToString:kVersion] || [command isEqualToString:@"-v"]) {
         version();
         return NO;
     } else {
@@ -248,7 +254,7 @@ void help() {
     }
     extent = [source extent];
     height = [NSNumber numberWithDouble:extent.size.height];
-    [detectorFeatures setObject:height forKey:@"height"];
+    [detectorFeatures setObject:height forKey:kHeight];
     if ([detectorFeatures objectForKey:CIDetectorImageOrientation] == nil) {
         // Check if image has orientation influence
         id imageOrientation = [[source properties] valueForKey:@"Orientation"];
@@ -273,5 +279,15 @@ void help() {
 -(CGRect)extent
 {
     return extent;
+}
+-(void)validate:(NSString *)arg value:(double)is between:(double)floor and:(double)ceil
+{
+    if (is < floor || is > ceil) {
+        [CidException throwMessage:@"%@ must be between %0.1f & %0.1f, not %0.f.\n",
+         arg,
+         floor,
+         ceil,
+         is];
+    }
 }
 @end

@@ -7,22 +7,24 @@
 //
 
 #import "CIFeature+Dict.h"
+#import "CidTypes.h"
 
 static double __image_height__ = 0;
 static int __invert_y_axis__ = 0;
 
 NSDictionary * (^rectToObject)(CGRect) = ^(CGRect rect)
 {
-    return @{@"x" : @(rect.origin.x),
-             @"y" : @(__invert_y_axis__ ? __image_height__ - rect.origin.y - rect.size.height : rect.origin.y),
-             @"width" : @(rect.size.width),
-             @"height" : @(rect.size.height)};
+    // lrint = double to
+    return @{kX : @(lrint(rect.origin.x)),
+             kY : @(__invert_y_axis__ ? lrint(__image_height__ - rect.origin.y - rect.size.height) : lrint(rect.origin.y)),
+             kWidth : @(lrint(rect.size.width)),
+             kHeight : @(lrint(rect.size.height))};
 };
 
 NSDictionary * (^pointToObject)(CGPoint) = ^(CGPoint point)
 {
-    return @{@"x" : @(point.x),
-             @"y" : @(__invert_y_axis__ ? __image_height__ - point.y : point.y)};
+    return @{kX : @(lrint(point.x)),
+             kY : @(__invert_y_axis__ ? lrint(__image_height__ - point.y) : lrint(point.y))};
 };
 
 
@@ -35,55 +37,58 @@ NSDictionary * (^pointToObject)(CGPoint) = ^(CGPoint point)
     if ([this hasLeftEyePosition]) {
         subFeature = [NSMutableDictionary dictionaryWithDictionary:pointToObject([this leftEyePosition])];
         if (closed) {
-            [subFeature setObject:@([this leftEyeClosed]) forKey:@"closed"];
+            [subFeature setObject:@([this leftEyeClosed]) forKey:kClosed];
         }
-        [outDict setObject:[subFeature copy] forKey:@"leftEye"];
+        [outDict setObject:[subFeature copy] forKey:kLeftEye];
     }
     if ([this hasRightEyePosition]) {
         subFeature = [NSMutableDictionary dictionaryWithDictionary:pointToObject([this rightEyePosition])];
         if (closed) {
-            [subFeature setObject:@([this rightEyeClosed]) forKey:@"closed"];
+            [subFeature setObject:@([this rightEyeClosed]) forKey:kClosed];
         }
-        [outDict setObject:[subFeature copy] forKey:@"rightEye"];
+        [outDict setObject:[subFeature copy] forKey:kRightEye];
     }
     if ([this hasMouthPosition]) {
         subFeature = [NSMutableDictionary dictionaryWithDictionary:pointToObject([this mouthPosition])];
         if (smile) {
-            [subFeature setObject:@([this hasSmile]) forKey:@"smile"];
+            [subFeature setObject:@([this hasSmile]) forKey:kSmile];
         }
-        [outDict setObject:[subFeature copy] forKey:@"mouth"];
+        [outDict setObject:[subFeature copy] forKey:kMouth];
     }
     return outDict;
 }
 -(NSMutableDictionary *)_processRetangleAttribute:(NSMutableDictionary *)outDict
 {
     CIRectangleFeature * this = (CIRectangleFeature *)self;
-    [outDict setObject:pointToObject([this topLeft    ]) forKey:@"topLeft"    ];
-    [outDict setObject:pointToObject([this topRight   ]) forKey:@"topRight"   ];
-    [outDict setObject:pointToObject([this bottomLeft ]) forKey:@"bottomLeft" ];
-    [outDict setObject:pointToObject([this bottomRight]) forKey:@"bottomRight"];
+    [outDict setObject:pointToObject([this topLeft    ]) forKey:kTopLeft    ];
+    [outDict setObject:pointToObject([this topRight   ]) forKey:kTopRight   ];
+    [outDict setObject:pointToObject([this bottomLeft ]) forKey:kBottomLeft ];
+    [outDict setObject:pointToObject([this bottomRight]) forKey:kBottomRight];
     return outDict;
 }
 -(NSDictionary *)dict:(NSDictionary *)options
 {
-    BOOL invertY = [[options objectForKey:@"yAxis"] boolValue];
-    if (invertY) {
+    BOOL blink, smile;
+    NSMutableDictionary * outDict;
+    NSString * message;
+    
+    if ([[options objectForKey:kYAxis] boolValue]) {
         __invert_y_axis__ = 1;
-        __image_height__ = [[options objectForKey:@"height"] doubleValue];
+        __image_height__ = [[options objectForKey:kHeight] doubleValue];
     }
     CGRect mbr = [self bounds];
-    NSMutableDictionary * outDict = [NSMutableDictionary dictionaryWithDictionary:rectToObject(mbr)];
+    outDict = [NSMutableDictionary dictionaryWithDictionary:rectToObject(mbr)];
     if ([self isKindOfClass:[CIFaceFeature class]]) {
-        BOOL blink = [[options objectForKey:CIDetectorEyeBlink] boolValue];
-        BOOL smile = [[options objectForKey:CIDetectorSmile] boolValue];
+        blink = [[options objectForKey:CIDetectorEyeBlink] boolValue];
+        smile = [[options objectForKey:CIDetectorSmile] boolValue];
         outDict = [self _processFaceAttributes:outDict
                                      withBlink:blink
                                      withSmile:smile];
     } else {
         outDict = [self _processRetangleAttribute:outDict];
         if ([self isKindOfClass:[CIQRCodeFeature class]]) {
-            NSString * message = [(CIQRCodeFeature *)self messageString];
-            [outDict setObject:message forKey:@"message"];
+            message = [(CIQRCodeFeature *)self messageString];
+            [outDict setObject:message forKey:kMessage];
         }
     }
     return [outDict copy];

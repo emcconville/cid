@@ -8,6 +8,7 @@
 
 #import "CidSerializer.h"
 #import "CidApp.h"
+#import "CidTypes.h"
 
 @implementation CidSerializer
 @synthesize type;
@@ -67,17 +68,16 @@
                               [[app inputImage] absoluteString]];
             for (feat in list) {
                 tmp = [NSString stringWithFormat:retangle,
-                       [[feat objectForKey:@"x"] longValue],
-                       [[feat objectForKey:@"y"] longValue],
-                       [[feat objectForKey:@"width"] longValue],
-                       [[feat objectForKey:@"height"] longValue]
+                       [[feat objectForKey:kX] longValue],
+                       [[feat objectForKey:kY] longValue],
+                       [[feat objectForKey:kWidth] longValue],
+                       [[feat objectForKey:kHeight] longValue]
                        ];
-                for (key in @[@"leftEye", @"rightEye", @"mouth", @"topLeft",
-                              @"topRight", @"bottomLeft", @"bottomRight",]) {
+                for (key in @[kLeftEye, kRightEye, kMouth, kTopLeft, kTopRight, kBottomLeft, kBottomRight]) {
                     if ((subFeat = [feat objectForKey:key]) != nil) {
                         tmp = [tmp stringByAppendingString:[NSString stringWithFormat:point,
-                                                            [[subFeat objectForKey:@"x"] longValue],
-                                                            [[subFeat objectForKey:@"y"] longValue]]];
+                                                            [[subFeat objectForKey:kX] longValue],
+                                                            [[subFeat objectForKey:kY] longValue]]];
                     }
                 }
                 dom = [dom stringByAppendingString:[NSString stringWithFormat:group, tmp]];
